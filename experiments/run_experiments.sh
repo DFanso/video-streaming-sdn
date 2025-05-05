@@ -19,18 +19,18 @@ run_experiment() {
     # Start the topology
     if [ "$topology" == "simple" ]; then
         if [ "$mode" == "bw" ]; then
-            sudo python topology/simple_topology.py bw $param &
+            sudo python3 topology/simple_topology.py bw $param &
         elif [ "$mode" == "loss" ]; then
-            sudo python topology/simple_topology.py loss $param &
+            sudo python3 topology/simple_topology.py loss $param &
         else
-            sudo python topology/simple_topology.py &
+            sudo python3 topology/simple_topology.py &
         fi
         topo_pid=$!
     else
         if [ "$mode" == "loss" ]; then
-            sudo python topology/complex_topology.py loss $param $param $param &
+            sudo python3 topology/complex_topology.py loss $param $param $param &
         else
-            sudo python topology/complex_topology.py &
+            sudo python3 topology/complex_topology.py &
         fi
         topo_pid=$!
     fi
@@ -39,7 +39,7 @@ run_experiment() {
     sleep 10
     
     # Get the server IP (h1)
-    server_ip=$(sudo mn -c && sudo python -c "from mininet.net import Mininet; from mininet.node import Controller, RemoteController; from mininet.cli import CLI; from mininet.log import setLogLevel; setLogLevel('info'); net = Mininet(); h1 = net.addHost('h1'); print(h1.IP())")
+    server_ip=$(sudo mn -c && sudo python3 -c "from mininet.net import Mininet; from mininet.node import Controller, RemoteController; from mininet.cli import CLI; from mininet.log import setLogLevel; setLogLevel('info'); net = Mininet(); h1 = net.addHost('h1'); print(h1.IP())")
     
     # Start Firefox on client (h2) and access the DASH player
     sudo mn -x h2 firefox http://${server_ip}/dash/index.html &
@@ -96,4 +96,4 @@ echo "Results are available in the experiments/results directory."
 
 # Analyze the results
 echo "Analyzing results..."
-python experiments/analyze_results.py 
+python3 experiments/analyze_results.py 

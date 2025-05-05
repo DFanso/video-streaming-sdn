@@ -14,15 +14,56 @@ sudo chown -R $USER:$USER /var/www/html/dash
 
 # Download and install DASH.js
 cd /tmp
+echo "Cloning DASH.js repository..."
 git clone https://github.com/Dash-Industry-Forum/dash.js.git
 cd dash.js
+
+# Install Node.js dependencies and build
+echo "Building DASH.js (this may take a few minutes)..."
+# Create a basic package.json if it doesn't exist or is malformed
+if [ ! -f package.json ] || ! grep -q "dependencies" package.json; then
+    echo '{
+  "name": "dashjs",
+  "version": "4.0.0",
+  "description": "A reference client implementation for the playback of MPEG DASH via JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "build": "grunt dist"
+  },
+  "dependencies": {
+    "grunt": "^1.0.4",
+    "grunt-cli": "^1.3.2",
+    "grunt-contrib-connect": "^2.0.0",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-jshint": "^2.1.0",
+    "grunt-contrib-uglify": "^4.0.1",
+    "grunt-contrib-watch": "^1.1.0",
+    "grunt-browserify": "^5.3.0",
+    "grunt-jsdoc": "^2.4.0"
+  }
+}' > package.json
+fi
+
+# Install dependencies and build
 npm install
 npm run build
 
+# In case the build process fails, try to get the pre-built file
+if [ ! -d "dist" ]; then
+    echo "Build process failed, downloading pre-built files..."
+    mkdir -p dist
+    curl -L https://cdn.dashjs.org/latest/dash.all.min.js -o dist/dash.all.min.js
+    curl -L https://cdn.dashjs.org/latest/dash.all.min.js.map -o dist/dash.all.min.js.map
+    echo "/* Placeholder CSS */" > dist/dash.all.min.css
+fi
+
 # Copy DASH.js files to Apache document root
+echo "Copying DASH.js files to web directory..."
+mkdir -p /var/www/html/dash/js
 cp -r dist/* /var/www/html/dash/js/
 
 # Create index.html for DASH player
+echo "Creating DASH player HTML page..."
 cat > /var/www/html/dash/index.html << 'EOF'
 <!DOCTYPE html>
 <html lang="en">
@@ -109,7 +150,7 @@ sudo mkdir -p /var/www/html/videos/dash
 sudo chown -R $USER:$USER /var/www/html/videos
 
 # Enable CORS for testing
-sudo cat > /etc/apache2/conf-available/cors.conf << 'EOF'
+sudo tee /etc/apache2/conf-available/cors.conf > /dev/null << 'EOF'
 <IfModule mod_headers.c>
     Header set Access-Control-Allow-Origin "*"
     Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"

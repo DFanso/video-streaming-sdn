@@ -4,16 +4,17 @@
 echo "Installing Mininet..."
 
 # Install dependencies
-sudo apt-get install -y mininet openvswitch-testcontroller
+sudo apt-get install -y mininet openvswitch-switch
 
-# Install additional tools for mininet
-sudo apt-get install -y python-matplotlib python-numpy python-pip wireshark tcpdump
+# Install additional tools for mininet (using Python 3 packages)
+sudo apt-get install -y python3-matplotlib python3-numpy python3-pip tcpdump wireshark
 
-# Stop the default controller and remove it from startup
-sudo service openvswitch-controller stop
-sudo update-rc.d openvswitch-controller disable
+# No need to stop non-existent controller
+# The following lines are commented out because they cause errors
+# sudo service openvswitch-controller stop
+# sudo update-rc.d openvswitch-controller disable
 
-# Clone Mininet repository for latest version (optional, comment if using packages is enough)
+# Clone Mininet repository for latest version
 cd /tmp
 git clone git://github.com/mininet/mininet
 cd mininet

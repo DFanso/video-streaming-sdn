@@ -125,6 +125,7 @@ def generate_bandwidth_graphs(results):
     plt.title('Initial Delay vs Bandwidth')
     plt.grid(True)
     plt.savefig(os.path.join(OUTPUT_DIR, 'bw_initial_delay.png'))
+    plt.close()
     
     # Plot buffering events vs bandwidth
     plt.figure(figsize=(10, 6))
@@ -134,6 +135,7 @@ def generate_bandwidth_graphs(results):
     plt.title('Buffering Events vs Bandwidth')
     plt.grid(True)
     plt.savefig(os.path.join(OUTPUT_DIR, 'bw_buffer_events.png'))
+    plt.close()
     
     # Plot average quality index vs bandwidth
     plt.figure(figsize=(10, 6))
@@ -143,6 +145,7 @@ def generate_bandwidth_graphs(results):
     plt.title('Average Quality vs Bandwidth')
     plt.grid(True)
     plt.savefig(os.path.join(OUTPUT_DIR, 'bw_avg_quality.png'))
+    plt.close()
     
     # Plot quality changes vs bandwidth
     plt.figure(figsize=(10, 6))
@@ -152,6 +155,7 @@ def generate_bandwidth_graphs(results):
     plt.title('Quality Changes vs Bandwidth')
     plt.grid(True)
     plt.savefig(os.path.join(OUTPUT_DIR, 'bw_quality_changes.png'))
+    plt.close()
 
 def generate_loss_graphs(results):
     """Generate graphs for packet loss experiments."""
@@ -173,6 +177,7 @@ def generate_loss_graphs(results):
     plt.title('Initial Delay vs Packet Loss')
     plt.grid(True)
     plt.savefig(os.path.join(OUTPUT_DIR, 'loss_initial_delay.png'))
+    plt.close()
     
     # Plot buffering events vs loss
     plt.figure(figsize=(10, 6))
@@ -182,6 +187,7 @@ def generate_loss_graphs(results):
     plt.title('Buffering Events vs Packet Loss')
     plt.grid(True)
     plt.savefig(os.path.join(OUTPUT_DIR, 'loss_buffer_events.png'))
+    plt.close()
     
     # Plot average quality index vs loss
     plt.figure(figsize=(10, 6))
@@ -191,6 +197,7 @@ def generate_loss_graphs(results):
     plt.title('Average Quality vs Packet Loss')
     plt.grid(True)
     plt.savefig(os.path.join(OUTPUT_DIR, 'loss_avg_quality.png'))
+    plt.close()
     
     # Plot quality changes vs loss
     plt.figure(figsize=(10, 6))
@@ -200,6 +207,7 @@ def generate_loss_graphs(results):
     plt.title('Quality Changes vs Packet Loss')
     plt.grid(True)
     plt.savefig(os.path.join(OUTPUT_DIR, 'loss_quality_changes.png'))
+    plt.close()
 
 def generate_complex_graphs(results):
     """Generate graphs for complex topology experiments."""
@@ -230,6 +238,7 @@ def generate_complex_graphs(results):
         plt.xticks(x, labels)
         plt.grid(True, axis='y')
         plt.savefig(os.path.join(OUTPUT_DIR, 'complex_initial_delay.png'))
+        plt.close()
         
         # Buffer events comparison
         plt.figure(figsize=(12, 6))
@@ -240,6 +249,7 @@ def generate_complex_graphs(results):
         plt.xticks(x, labels)
         plt.grid(True, axis='y')
         plt.savefig(os.path.join(OUTPUT_DIR, 'complex_buffer_events.png'))
+        plt.close()
         
         # Average quality comparison
         plt.figure(figsize=(12, 6))
@@ -250,6 +260,7 @@ def generate_complex_graphs(results):
         plt.xticks(x, labels)
         plt.grid(True, axis='y')
         plt.savefig(os.path.join(OUTPUT_DIR, 'complex_avg_quality.png'))
+        plt.close()
 
 if __name__ == "__main__":
     analyze_results() 

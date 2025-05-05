@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Complex Mininet topology for adaptive video streaming with SDN
@@ -83,8 +83,8 @@ def complexTopology():
     
     # Configure Apache on the server host
     info('*** Configuring server\n')
-    h1.cmd('service apache2 stop')  # Stop any existing Apache service
-    h1.cmd('apache2 -k start')      # Start Apache in the server namespace
+    h1.cmd('service apache2 stop || true')  # Stop any existing Apache service, ignoring errors
+    h1.cmd('apache2 -k start || true')      # Start Apache in the server namespace, ignoring errors
     
     # Information
     info('*** Running CLI\n')
@@ -166,8 +166,8 @@ def complexTopologyWithLoss(loss1=0, loss2=0, loss3=0):
     
     # Configure Apache on the server host
     info('*** Configuring server\n')
-    h1.cmd('service apache2 stop')  # Stop any existing Apache service
-    h1.cmd('apache2 -k start')      # Start Apache in the server namespace
+    h1.cmd('service apache2 stop || true')  # Stop any existing Apache service, ignoring errors
+    h1.cmd('apache2 -k start || true')      # Start Apache in the server namespace, ignoring errors
     
     # Information
     info('*** Running CLI\n')
@@ -199,7 +199,7 @@ if __name__ == '__main__':
             except ValueError:
                 print("Loss percentages must be numbers")
         else:
-            print("Usage: python complex_topology.py [loss <loss1%> <loss2%> <loss3%>]")
+            print("Usage: python3 complex_topology.py [loss <loss1%> <loss2%> <loss3%>]")
     else:
         # Default complex topology
         complexTopology() 

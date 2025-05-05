@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 """
 Simple Mininet topology for adaptive video streaming with SDN
@@ -68,8 +68,8 @@ def simpleTopology():
     
     # Configure Apache on the server host
     info('*** Configuring server\n')
-    h1.cmd('service apache2 stop')  # Stop any existing Apache service
-    h1.cmd('apache2 -k start')      # Start Apache in the server namespace
+    h1.cmd('service apache2 stop || true')  # Stop any existing Apache service, ignoring errors
+    h1.cmd('apache2 -k start || true')      # Start Apache in the server namespace, ignoring errors
     
     # Information
     info('*** Running CLI\n')
@@ -140,8 +140,8 @@ def variableBandwidthTopology(bw=5):
     
     # Configure Apache on the server host
     info('*** Configuring server\n')
-    h1.cmd('service apache2 stop')  # Stop any existing Apache service
-    h1.cmd('apache2 -k start')      # Start Apache in the server namespace
+    h1.cmd('service apache2 stop || true')  # Stop any existing Apache service, ignoring errors
+    h1.cmd('apache2 -k start || true')      # Start Apache in the server namespace, ignoring errors
     
     # Information
     info('*** Running CLI\n')
@@ -207,8 +207,8 @@ def variableLossTopology(loss=0):
     
     # Configure Apache on the server host
     info('*** Configuring server\n')
-    h1.cmd('service apache2 stop')  # Stop any existing Apache service
-    h1.cmd('apache2 -k start')      # Start Apache in the server namespace
+    h1.cmd('service apache2 stop || true')  # Stop any existing Apache service, ignoring errors
+    h1.cmd('apache2 -k start || true')      # Start Apache in the server namespace, ignoring errors
     
     # Information
     info('*** Running CLI\n')
@@ -246,7 +246,7 @@ if __name__ == '__main__':
             except ValueError:
                 print("Loss percentage must be a number")
         else:
-            print("Usage: python simple_topology.py [bw <bandwidth>|loss <loss_percentage>]")
+            print("Usage: python3 simple_topology.py [bw <bandwidth>|loss <loss_percentage>]")
     else:
         # Default simple topology
         simpleTopology() 

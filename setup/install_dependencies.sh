@@ -16,6 +16,12 @@ sudo apt-get update && sudo apt-get upgrade -y
 echo "Installing common dependencies..."
 sudo apt-get install -y git curl wget python3 python3-pip unzip net-tools htop
 
+# Install Node.js (needed for DASH.js)
+echo "Installing Node.js..."
+curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo npm install -g npm@latest
+
 # Install specific components
 echo "Setting up Mininet..."
 ./setup/setup_mininet.sh
@@ -31,4 +37,4 @@ echo "Setting up video segments..."
 
 echo "Installation completed successfully!"
 echo "You can now run the experiments using the scripts in the 'experiments' directory."
-echo "Start the simple topology with: sudo python topology/simple_topology.py" 
+echo "Start the simple topology with: sudo python3 topology/simple_topology.py" 

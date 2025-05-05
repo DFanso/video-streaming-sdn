@@ -119,7 +119,50 @@ fi
 # Copy DASH.js files to Apache document root
 echo "Copying DASH.js files to web directory..."
 mkdir -p /var/www/html/dash/js
-cp -r dist/* /var/www/html/dash/js/
+
+# Copy files from subdirectories if they exist, or try different subdirectories until found
+if [ -d "dist/modern/umd" ]; then
+    echo "Found modern UMD build, copying files..."
+    cp -r dist/modern/umd/* /var/www/html/dash/js/
+elif [ -d "dist/modern/esm" ]; then
+    echo "Found modern ESM build, copying files..."
+    cp -r dist/modern/esm/* /var/www/html/dash/js/
+elif [ -d "dist/legacy/umd" ]; then
+    echo "Found legacy UMD build, copying files..."
+    cp -r dist/legacy/umd/* /var/www/html/dash/js/
+else
+    # For backward compatibility - older versions had files directly in dist
+    echo "Trying direct dist folder..."
+    cp -r dist/* /var/www/html/dash/js/
+    
+    # If the files are still not found, try to get from CDN as fallback
+    if [ ! -f "/var/www/html/dash/js/dash.all.min.js" ]; then
+        echo "Files not found in dist, downloading from CDN..."
+        curl -L https://cdn.dashjs.org/latest/dash.all.min.js -o /var/www/html/dash/js/dash.all.min.js
+        curl -L https://cdn.dashjs.org/latest/dash.all.min.js.map -o /var/www/html/dash/js/dash.all.min.js.map
+    fi
+fi
+
+# For existing installations, check if files need to be copied from a different location
+if [ ! -f "/var/www/html/dash/js/dash.all.min.js" ]; then
+    echo "Checking for files in possible subdirectories..."
+    # Try to find the files from modern/umd directory
+    if [ -f "/var/www/html/dash/js/modern/umd/dash.all.min.js" ]; then
+        echo "Copying from modern/umd directory..."
+        cp /var/www/html/dash/js/modern/umd/dash.all.min.js /var/www/html/dash/js/
+        cp /var/www/html/dash/js/modern/umd/dash.all.min.js.map /var/www/html/dash/js/ 2>/dev/null || echo "Map file not found in modern/umd"
+    # Try to find the files from modern/esm directory
+    elif [ -f "/var/www/html/dash/js/modern/esm/dash.all.min.js" ]; then
+        echo "Copying from modern/esm directory..."
+        cp /var/www/html/dash/js/modern/esm/dash.all.min.js /var/www/html/dash/js/
+        cp /var/www/html/dash/js/modern/esm/dash.all.min.js.map /var/www/html/dash/js/ 2>/dev/null || echo "Map file not found in modern/esm"
+    # Try to find the files from legacy/umd directory
+    elif [ -f "/var/www/html/dash/js/legacy/umd/dash.all.min.js" ]; then
+        echo "Copying from legacy/umd directory..."
+        cp /var/www/html/dash/js/legacy/umd/dash.all.min.js /var/www/html/dash/js/
+        cp /var/www/html/dash/js/legacy/umd/dash.all.min.js.map /var/www/html/dash/js/ 2>/dev/null || echo "Map file not found in legacy/umd"
+    fi
+fi
 
 # Create index.html for DASH player
 echo "Creating DASH player HTML page..."

@@ -35,6 +35,61 @@ This happens because newer versions of Mininet use different package names.
 
 **Solution**: This error can be safely ignored since the script has been updated to use the correct package names.
 
+### Mininet Git Clone Issues
+
+If you encounter issues cloning the Mininet repository with errors like:
+
+```
+Cloning into 'mininet'...
+fatal: unable to connect to github.com
+```
+
+This is likely due to network restrictions or firewall settings blocking the git protocol.
+
+**Solution**: The script has been updated to use HTTPS instead of the git protocol. If you're still having issues, you can manually clone using:
+
+```bash
+git clone https://github.com/mininet/mininet.git
+```
+
+### Chrome/Karma Test Issues
+
+If you encounter errors related to ChromeHeadless during DASH.js installation:
+
+```
+ERROR [launcher]: No binary for ChromeHeadless browser on your platform.
+Please, set "CHROME_BIN" env variable.
+```
+
+This happens because Karma is trying to run tests in a headless Chrome browser, but Chrome is not installed or the environment variable is not set.
+
+**Solution**: The setup script has been updated to install Chrome and set the environment variable. If you're still encountering issues, you can:
+
+1. Install Chrome manually:
+```bash
+wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+sudo apt-get update
+sudo apt-get install -y google-chrome-stable
+```
+
+2. Set the CHROME_BIN environment variable:
+```bash
+export CHROME_BIN=$(which google-chrome)
+```
+
+3. If running in a container or CI environment, you may need to run Chrome with the --no-sandbox flag:
+```bash
+# In karma.conf.js
+browsers: ['ChromeHeadless'],
+customLaunchers: {
+  ChromeHeadless: {
+    base: 'Chrome',
+    flags: ['--headless', '--disable-gpu', '--no-sandbox']
+  }
+}
+```
+
 ### Node.js and DASH.js Build Issues
 
 If you encounter issues with building DASH.js:
@@ -47,7 +102,7 @@ Error while building DASH.js
 **Solution**: Make sure Node.js and npm are installed:
 
 ```bash
-curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+curl -sL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo npm install -g npm@latest
 ```

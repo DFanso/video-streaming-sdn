@@ -58,19 +58,31 @@ if [ ! -f package.json ] || ! grep -q "dependencies" package.json; then
 }' > package.json
 fi
 
-# Create a karma config that doesn't require Chrome for testing
-echo "Configuring Karma to skip browser tests..."
+# Create a karma config that properly configures ChromeHeadless with required flags
+echo "Configuring Karma with proper ChromeHeadless settings..."
 cat > karma.conf.js << 'EOF'
 module.exports = function(config) {
   config.set({
-    browsers: [],
+    browsers: ['ChromeHeadlessNoSandbox'],
     frameworks: ['jasmine'],
-    singleRun: true
+    singleRun: true,
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox',
+          '--disable-software-rasterizer'
+        ]
+      }
+    }
   });
 };
 EOF
 
-# Install dependencies and build
+# Install dependencies 
 npm install
 
 # Build without running tests

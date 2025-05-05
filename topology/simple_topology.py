@@ -17,7 +17,6 @@ from mininet.log import setLogLevel, info
 from mininet.link import TCLink, Intf
 from subprocess import call
 import sys
-import os
 
 def simpleTopology():
     "Create a simple topology with one server, one client, and one switch"
@@ -72,16 +71,6 @@ def simpleTopology():
     h1.cmd('service apache2 stop || true')  # Stop any existing Apache service, ignoring errors
     h1.cmd('apache2 -k start || true')      # Start Apache in the server namespace, ignoring errors
     
-    # Copy Chrome wrapper to client
-    if os.path.exists('./setup/chrome-wrapper.sh'):
-        h2.cmd('mkdir -p /tmp/scripts')
-        with open('./setup/chrome-wrapper.sh', 'r') as f:
-            script = f.read()
-        with open('/tmp/chrome-wrapper.sh', 'w') as f:
-            f.write(script)
-        h2.cmd('cp /tmp/chrome-wrapper.sh /tmp/scripts/chrome-wrapper.sh')
-        h2.cmd('chmod +x /tmp/scripts/chrome-wrapper.sh')
-    
     # Information
     info('*** Running CLI\n')
     info('*** Server IP: {}\n'.format(h1.IP()))
@@ -90,7 +79,7 @@ def simpleTopology():
     
     # Provide useful commands
     info('*** Useful commands:\n')
-    info('   h2 /tmp/scripts/chrome-wrapper.sh http://10.0.0.1/dash/index.html &  # Start Chrome browser on client to access DASH player\n')
+    info('   h2 firefox http://10.0.0.1/dash/index.html &  # Start Firefox browser on client to access DASH player\n')
     info('   h1 tail -f /var/log/apache2/access.log        # View Apache access logs\n')
     info('   h2 ping h1                                    # Test connectivity\n')
     

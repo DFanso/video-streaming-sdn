@@ -33,7 +33,7 @@ echo "Setting up Apache and DASH.js..."
 ./setup/setup_apache.sh
 
 echo "Setting up video segments..."
-./setup/setup_video.sh
+./setup/prepare_video.sh
 
 echo "Installation completed successfully!"
 echo "You can now run the experiments using the scripts in the 'experiments' directory."

@@ -34,133 +34,29 @@ chmod +x /tmp/chrome-wrapper.sh
 export CHROME_BIN=/tmp/chrome-wrapper.sh
 echo "Chrome wrapper location: $CHROME_BIN"
 
-# Download and install DASH.js
+# Download and install DASH.js pre-built files
 cd /tmp
-echo "Cloning DASH.js repository..."
-git clone https://github.com/Dash-Industry-Forum/dash.js.git
-cd dash.js
-
-# Install Node.js dependencies and build
-echo "Building DASH.js (this may take a few minutes)..."
-# Create a basic package.json if it doesn't exist or is malformed
-if [ ! -f package.json ] || ! grep -q "dependencies" package.json; then
-    echo '{
-  "name": "dashjs",
-  "version": "4.0.0",
-  "description": "A reference client implementation for the playback of MPEG DASH via JavaScript",
-  "main": "index.js",
-  "scripts": {
-    "build": "grunt dist"
-  },
-  "dependencies": {
-    "grunt": "^1.0.4",
-    "grunt-cli": "^1.3.2",
-    "grunt-contrib-connect": "^2.0.0",
-    "grunt-contrib-copy": "^1.0.0",
-    "grunt-contrib-jshint": "^2.1.0",
-    "grunt-contrib-uglify": "^4.0.1",
-    "grunt-contrib-watch": "^1.1.0",
-    "grunt-browserify": "^5.3.0",
-    "grunt-jsdoc": "^2.4.0"
-  }
-}' > package.json
-fi
-
-# Create a karma config with no-sandbox flags
-echo "Configuring Karma with proper ChromeHeadless settings..."
-cat > karma.conf.js << 'EOF'
-module.exports = function(config) {
-  config.set({
-    browsers: ['ChromeHeadlessNoSandbox'],
-    frameworks: ['jasmine'],
-    singleRun: true,
-    customLaunchers: {
-      ChromeHeadlessNoSandbox: {
-        base: 'ChromeHeadless',
-        flags: [
-          '--no-sandbox',
-          '--disable-gpu',
-          '--disable-dev-shm-usage',
-          '--disable-setuid-sandbox',
-          '--disable-software-rasterizer'
-        ]
-      }
-    }
-  });
-};
-EOF
-
-# Completely skip tests to avoid Chrome issues
-echo "Bypassing Karma tests completely..."
-mkdir -p node_modules/karma
-cat > node_modules/karma/bin/karma << 'EOF'
-#!/bin/sh
-echo "Karma tests bypassed"
-exit 0
-EOF
-chmod +x node_modules/karma/bin/karma
-
-# Install dependencies 
-npm install
-
-# Build without running tests
-echo "Building DASH.js without tests..."
-npm run build || true
-
-# In case the build process fails, try to get the pre-built file
-if [ ! -d "dist" ]; then
-    echo "Build process failed, downloading pre-built files..."
-    mkdir -p dist
-    curl -L https://cdn.dashjs.org/latest/dash.all.min.js -o dist/dash.all.min.js
-    curl -L https://cdn.dashjs.org/latest/dash.all.min.js.map -o dist/dash.all.min.js.map
-    echo "/* Placeholder CSS */" > dist/dash.all.min.css
-fi
+echo "Downloading DASH.js pre-built files..."
+mkdir -p dash.js/dist
+curl -L https://cdn.dashjs.org/latest/dash.all.min.js -o dash.js/dist/dash.all.min.js
+curl -L https://cdn.dashjs.org/latest/dash.all.min.js.map -o dash.js/dist/dash.all.min.js.map
+echo "/* Placeholder CSS */" > dash.js/dist/dash.all.min.css
 
 # Copy DASH.js files to Apache document root
 echo "Copying DASH.js files to web directory..."
 mkdir -p /var/www/html/dash/js
 
-# Copy files from subdirectories if they exist, or try different subdirectories until found
-if [ -d "dist/modern/umd" ]; then
-    echo "Found modern UMD build, copying files..."
-    cp -r dist/modern/umd/* /var/www/html/dash/js/
-elif [ -d "dist/modern/esm" ]; then
-    echo "Found modern ESM build, copying files..."
-    cp -r dist/modern/esm/* /var/www/html/dash/js/
-elif [ -d "dist/legacy/umd" ]; then
-    echo "Found legacy UMD build, copying files..."
-    cp -r dist/legacy/umd/* /var/www/html/dash/js/
-else
-    # For backward compatibility - older versions had files directly in dist
-    echo "Trying direct dist folder..."
-    cp -r dist/* /var/www/html/dash/js/
-    
-    # If the files are still not found, try to get from CDN as fallback
-    if [ ! -f "/var/www/html/dash/js/dash.all.min.js" ]; then
-        echo "Files not found in dist, downloading from CDN..."
-        curl -L https://cdn.dashjs.org/latest/dash.all.min.js -o /var/www/html/dash/js/dash.all.min.js
-        curl -L https://cdn.dashjs.org/latest/dash.all.min.js.map -o /var/www/html/dash/js/dash.all.min.js.map
-    fi
-fi
+# Copy files from the downloaded 'dist' directory
+cp -r dash.js/dist/* /var/www/html/dash/js/
 
-# For existing installations, check if files need to be copied from a different location
+# Ensure files are present, fallback to CDN download directly into web dir if necessary
 if [ ! -f "/var/www/html/dash/js/dash.all.min.js" ]; then
-    echo "Checking for files in possible subdirectories..."
-    # Try to find the files from modern/umd directory
-    if [ -f "/var/www/html/dash/js/modern/umd/dash.all.min.js" ]; then
-        echo "Copying from modern/umd directory..."
-        cp /var/www/html/dash/js/modern/umd/dash.all.min.js /var/www/html/dash/js/
-        cp /var/www/html/dash/js/modern/umd/dash.all.min.js.map /var/www/html/dash/js/ 2>/dev/null || echo "Map file not found in modern/umd"
-    # Try to find the files from modern/esm directory
-    elif [ -f "/var/www/html/dash/js/modern/esm/dash.all.min.js" ]; then
-        echo "Copying from modern/esm directory..."
-        cp /var/www/html/dash/js/modern/esm/dash.all.min.js /var/www/html/dash/js/
-        cp /var/www/html/dash/js/modern/esm/dash.all.min.js.map /var/www/html/dash/js/ 2>/dev/null || echo "Map file not found in modern/esm"
-    # Try to find the files from legacy/umd directory
-    elif [ -f "/var/www/html/dash/js/legacy/umd/dash.all.min.js" ]; then
-        echo "Copying from legacy/umd directory..."
-        cp /var/www/html/dash/js/legacy/umd/dash.all.min.js /var/www/html/dash/js/
-        cp /var/www/html/dash/js/legacy/umd/dash.all.min.js.map /var/www/html/dash/js/ 2>/dev/null || echo "Map file not found in legacy/umd"
+    echo "Files not copied correctly, downloading directly to web directory from CDN..."
+    curl -L https://cdn.dashjs.org/latest/dash.all.min.js -o /var/www/html/dash/js/dash.all.min.js
+    curl -L https://cdn.dashjs.org/latest/dash.all.min.js.map -o /var/www/html/dash/js/dash.all.min.js.map
+    # Create a minimal CSS file if needed
+    if [ ! -f "/var/www/html/dash/js/dash.all.min.css" ]; then
+        echo "/* Placeholder CSS */" > /var/www/html/dash/js/dash.all.min.css
     fi
 fi
 

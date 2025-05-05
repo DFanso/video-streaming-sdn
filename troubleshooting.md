@@ -90,6 +90,45 @@ customLaunchers: {
 }
 ```
 
+### Chrome Sandbox Issues
+
+If you encounter this specific error when running Chrome in headless mode:
+
+```
+Running as root without --no-sandbox is not supported. See https://crbug.com/638180
+```
+
+This happens when trying to run Chrome as the root user, which is a common scenario in Docker containers or CI environments.
+
+**Solution**: You need to configure Chrome to run with the `--no-sandbox` flag, which has security implications but is often necessary in containerized environments:
+
+1. Create a custom launcher in your karma.conf.js:
+```javascript
+module.exports = function(config) {
+  config.set({
+    browsers: ['ChromeHeadlessNoSandbox'],
+    customLaunchers: {
+      ChromeHeadlessNoSandbox: {
+        base: 'ChromeHeadless',
+        flags: [
+          '--no-sandbox',
+          '--disable-gpu',
+          '--disable-dev-shm-usage',
+          '--disable-setuid-sandbox'
+        ]
+      }
+    }
+  });
+};
+```
+
+2. For other applications using Chrome, pass these flags directly to Chrome:
+```bash
+google-chrome --no-sandbox --disable-gpu
+```
+
+3. In containerized environments, consider running the process as a non-root user if possible.
+
 ### Node.js and DASH.js Build Issues
 
 If you encounter issues with building DASH.js:

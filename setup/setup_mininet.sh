@@ -16,7 +16,8 @@ sudo apt-get install -y python3-matplotlib python3-numpy python3-pip tcpdump wir
 
 # Clone Mininet repository for latest version
 cd /tmp
-git clone git://github.com/mininet/mininet
+# Using HTTPS instead of git:// protocol to avoid firewall issues
+git clone https://github.com/mininet/mininet.git
 cd mininet
 git checkout -b 2.3.0 2.3.0
 

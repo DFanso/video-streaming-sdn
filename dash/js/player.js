@@ -41,7 +41,7 @@
 
     // Initialize player
     function initPlayer() {
-        const url = "../videos/dash/manifest.mpd";
+        const url = "/videos/dash/manifest.mpd";
         const videoElement = document.querySelector("#videoPlayer");
         const player = dashjs.MediaPlayer().create();
         

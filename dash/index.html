@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Adaptive Video Streaming over SDN - DASH.js Player</title>
+    <meta name="description" content="DASH.js Reference Player for Adaptive Video Streaming over SDN">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .dash-video-player {
+            margin: 20px 0;
+        }
+        .videoContainer {
+            width: 100%;
+            background-color: #000;
+            position: relative;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            max-height: 600px;
+        }
+        #stats-info {
+            display: flex;
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        #video-info, #event-info {
+            flex: 1;
+            padding: 15px;
+        }
+        #video-info {
+            background-color: #f9f9f9;
+            border-right: 1px solid #ddd;
+        }
+        #event-log {
+            height: 200px;
+            overflow: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 12px;
+            background-color: #f0f0f0;
+            font-family: monospace;
+        }
+        .control-bar {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 5px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #stats-output {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            display: none;
+        }
+        #available-qualities {
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        .network-info {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f0f8ff;
+        }
+    </style>
+    <!-- DASH.js libraries -->
+    <script src="js/dash.all.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Adaptive Video Streaming over SDN</h1>
+        
+        <div class="dash-video-player">
+            <div class="videoContainer">
+                <video id="videoPlayer" controls></video>
+            </div>
+        </div>
+        
+        <div class="network-info">
+            <h3>Network Information</h3>
+            <p>This player demonstrates adaptive video streaming using DASH.js over an SDN network.</p>
+            <p>The player will automatically adapt the video quality based on the available network bandwidth and buffer status.</p>
+        </div>
+        
+        <div id="stats-info">
+            <div id="video-info">
+                <h3>Video Information</h3>
+                <div><strong>Video Representation:</strong> <span id="video-representation">-</span></div>
+                <div><strong>Buffer Level:</strong> <span id="buffer-level">0</span> s</div>
+                <div><strong>Quality Index:</strong> <span id="quality-index">-</span></div>
+                <div><strong>Max Index:</strong> <span id="max-index">-</span></div>
+                <h4>Available Qualities:</h4>
+                <div id="available-qualities">Loading...</div>
+            </div>
+            <div id="event-info">
+                <h3>Playback Events</h3>
+                <div id="event-log"></div>
+            </div>
+        </div>
+        
+        <div class="control-bar">
+            <button id="stats-button">Show Detailed Statistics</button>
+            <button onclick="window.dashPlayer.setAutoSwitchQualityFor('video', false); window.dashPlayer.setQualityFor('video', 0);">Force Lowest Quality</button>
+            <button onclick="window.dashPlayer.setAutoSwitchQualityFor('video', false); window.dashPlayer.setQualityFor('video', parseInt(document.getElementById('max-index').textContent));">Force Highest Quality</button>
+            <button onclick="window.dashPlayer.setAutoSwitchQualityFor('video', true);">Enable Auto-Adaptation</button>
+        </div>
+        
+        <div id="stats-output"></div>
+    </div>
+
+    <!-- Player configuration -->
+    <script src="js/player.js"></script>
+</body>
+</html> 
